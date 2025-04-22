@@ -73,8 +73,8 @@ int** m1(int** a_1,int** a_2,int** b_1,int** b_2, int dim){
 	int** sub_matriz_2 = sum(b_1,b_2,dim);
 
 	int** result = multiplication(sub_matriz_1,sub_matriz_2,dim);
-	free_matriz(sub_matriz_1);
-	free_matriz(sub_matriz_2);
+	free_matriz(sub_matriz_1,dim);
+	free_matriz(sub_matriz_2,dim);
 	return result;
 
 }
@@ -82,14 +82,14 @@ int** m2_m5(int** sum_1,int** sum_2, int** mul,int dim){
 	int** sub_matriz = sum(sum_1,sum_2,dim);
 	
 	int** result = multiplication(sub_matriz,mul,dim);
-	free_matriz(sub_matriz);
+	free_matriz(sub_matriz,dim);
 	return result;
 }
 int** m3_m4(int** sub_1,int** sub_2, int** mul,int dim){
 	int** sub_matriz = sub(sub_1,sub_2,dim);
 
         int** result = multiplication(sub_matriz,mul,dim);
-	free_matriz(sub_matriz);
+	free_matriz(sub_matriz,dim);
         return result;
 }
 int** m6_m7(int** a_1,int** a_2,int** b_1,int** b_2, int dim){
@@ -99,8 +99,8 @@ int** m6_m7(int** a_1,int** a_2,int** b_1,int** b_2, int dim){
 
         int** result = multiplication(sub_matriz_1,sub_matriz_2,dim);
 	
-	free_matriz(sub_matriz_1);
-	free_matriz(sub_matriz_2);
+	free_matriz(sub_matriz_1,dim);
+	free_matriz(sub_matriz_2,dim);
         
 	return result;
 
@@ -157,7 +157,7 @@ int** mult_matrices(int** a, int** b,int dim){
     	int** M_6 = m6_m7(A_21, A_11, B_11, B_12, mitad);
     	int** M_7 = m6_m7(A_12, A_22, B_21, B_22, mitad);
 
-    	int** C_11 = sum(sub_matriz(sum_matriz(M_1, M_4, mitad), M_5, mitad), M_7, mitad);
+    	int** C_11 = sum(sub(sum(M_1, M_4, mitad), M_5, mitad), M_7, mitad);
     	int** C_12 = sum(M_3, M_5, mitad);
     	int** C_21 = sum(M_2, M_4, mitad);
     	int** C_22 = sum(sum(sub(M_1, M_2, mitad), M_3, mitad), M_6, mitad);
@@ -176,18 +176,48 @@ int** mult_matrices(int** a, int** b,int dim){
 
 }
 
+int main() {
+    int dim = 4;
 
+    // Define matrix A
+    int A_vals[4][4] = {
+        {1, 2, 3, 4},
+        {5, 6, 7, 8},
+        {9, 8, 7, 6},
+        {5, 4, 3, 2}
+    };
 
+    // Define matrix B
+    int B_vals[4][4] = {
+        {1, 0, 1, 0},
+        {0, 1, 0, 1},
+        {1, 0, 1, 0},
+        {0, 1, 0, 1}
+    };
 
+    // Allocate and fill matrix A
+    int** A = creacion_matriz(dim);
+    int** B = creacion_matriz(dim);
+    for (int i = 0; i < dim; ++i) {
+        for (int j = 0; j < dim; ++j) {
+            A[i][j] = A_vals[i][j];
+            B[i][j] = B_vals[i][j];
+        }
+    }
 
+    // Multiply using Strassen
+    int** C = mult_matrices(A, B, dim);
 
+    // Print result
+    cout << "Result of A × B:" << endl;
+    printMatrix(C, dim);
 
+    // Clean up
+    free_matriz(A, dim);
+    free_matriz(B, dim);
+    free_matriz(C, dim);
 
-
-
-
-
-
-
+    return 0;
+}
 
 
