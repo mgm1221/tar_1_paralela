@@ -35,7 +35,7 @@ int** m2_m5(int** sum_1,int** sum_2, int** mul,int dim){
 int** m3_m4(int** sub_1,int** sub_2, int** mul,int dim){
 	int** sub_matriz = sub(sub_1,sub_2,dim);
 
-        int** result = multiply(sub_matriz,mul,dim);
+        int** result = multiply(mul,sub_matriz,dim);
 	free_mat(sub_matriz,dim);
         return result;
 }
