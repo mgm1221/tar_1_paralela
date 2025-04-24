@@ -1,106 +1,46 @@
 #include <iostream>
 #include <tuple>
+
+#include "strassen.h"
+#include "utility.h"
+
 using namespace std;
-void free_matriz(int** matriz, int dim) {
-    for (int i = 0; i < dim; ++i) {
-        delete[] matriz[i];
-    }
-    delete[] matriz;
-}
-int** creacion_matriz(int dim){
-	int** matrix = new int*[dim];
 
-        for(int i  = 0;i<dim; i++){
-                matrix[i] = new int[dim];
-        }
-	return matrix;
-}
-
-int** multiplication(int** mat_a, int** mat_b,int dim){
-	int** result = creacion_matriz(dim);
-
-	for(int i =0; i< dim ; i++){
-
-		for (int j = 0; j< dim; j++){
-		
-			result[i][j] = 0;
-		
-			for(int x =0;x < dim;x++){
-		
-		 		result[i][j] += mat_a[i][x] * mat_b[x][j];	
-		
-			}
-		}		
-
-	}
-	return result;
-}
-
-int** sum(int** mat_a,int** mat_b,int dim){
-	
-	int** result = creacion_matriz(dim);
-
-	for(int i =0;i<dim;i++){
-	
-		for(int j=0;j<dim;j++){
-		
-			result[i][j] = mat_a[i][j] + mat_b[i][j];
-
-		}
-	
-	}
-	return result;
-}
-int** sub(int** mat_a,int** mat_b,int dim){
-
-        int** result = creacion_matriz(dim);
-
-        for(int i =0;i<dim;i++){
-
-                for(int j=0;j<dim;j++){
-
-                        result[i][j] = mat_a[i][j] - mat_b[i][j];
-
-                }
-
-        }
-	return result;
-}
 int** m1(int** a_1,int** a_2,int** b_1,int** b_2, int dim){
 
-	int** sub_matriz_1 = sum(a_1,a_2,dim);
+	int** sub_matriz_1 = add(a_1,a_2,dim);
 
-	int** sub_matriz_2 = sum(b_1,b_2,dim);
+	int** sub_matriz_2 = add(b_1,b_2,dim);
 
-	int** result = multiplication(sub_matriz_1,sub_matriz_2,dim);
-	free_matriz(sub_matriz_1,dim);
-	free_matriz(sub_matriz_2,dim);
+	int** result = multiply(sub_matriz_1,sub_matriz_2,dim);
+	free_mat(sub_matriz_1,dim);
+	free_mat(sub_matriz_2,dim);
 	return result;
 
 }
 int** m2_m5(int** sum_1,int** sum_2, int** mul,int dim){
-	int** sub_matriz = sum(sum_1,sum_2,dim);
+	int** sub_matriz = add(sum_1,sum_2,dim);
 	
-	int** result = multiplication(sub_matriz,mul,dim);
-	free_matriz(sub_matriz,dim);
+	int** result = multiply(sub_matriz,mul,dim);
+	free_mat(sub_matriz,dim);
 	return result;
 }
 int** m3_m4(int** sub_1,int** sub_2, int** mul,int dim){
 	int** sub_matriz = sub(sub_1,sub_2,dim);
 
-        int** result = multiplication(sub_matriz,mul,dim);
-	free_matriz(sub_matriz,dim);
+        int** result = multiply(sub_matriz,mul,dim);
+	free_mat(sub_matriz,dim);
         return result;
 }
 int** m6_m7(int** a_1,int** a_2,int** b_1,int** b_2, int dim){
 	int** sub_matriz_1 = sub(a_1,a_2,dim);
 
-        int** sub_matriz_2 = sum(b_1,b_2,dim);
+        int** sub_matriz_2 = add(b_1,b_2,dim);
 
-        int** result = multiplication(sub_matriz_1,sub_matriz_2,dim);
+        int** result = multiply(sub_matriz_1,sub_matriz_2,dim);
 	
-	free_matriz(sub_matriz_1,dim);
-	free_matriz(sub_matriz_2,dim);
+	free_mat(sub_matriz_1,dim);
+	free_mat(sub_matriz_2,dim);
         
 	return result;
 
@@ -109,10 +49,10 @@ tuple<int**,int**,int**,int**> separar_matriz(int** mat,int dim){
 	
 	int dim_2 = dim / 2;
 
-    	int** A11 = creacion_matriz(dim_2);
-    	int** A12 = creacion_matriz(dim_2);
-    	int** A21 = creacion_matriz(dim_2);
-    	int** A22 = creacion_matriz(dim_2);
+    	int** A11 = new_mat(dim_2);
+    	int** A12 = new_mat(dim_2);
+    	int** A21 = new_mat(dim_2);
+    	int** A22 = new_mat(dim_2);
 
     	for (int i = 0; i < dim_2; ++i) {
         	for (int j = 0; j < dim_2; ++j) {
@@ -140,9 +80,9 @@ void printMatrix(int** mat, int dim) {
 }
 
 
-int** mult_matrices(int** a, int** b,int dim){
+int** Strassen_Matrix_Multiplication(int** a, int** b,int dim){
 	
-	int** result = creacion_matriz(dim);
+	int** result = new_mat(dim);
 
 	auto [A_11, A_12, A_21, A_22] = separar_matriz(a,dim);
 	auto [B_11, B_12, B_21, B_22] = separar_matriz(b,dim);
@@ -157,10 +97,10 @@ int** mult_matrices(int** a, int** b,int dim){
     	int** M_6 = m6_m7(A_21, A_11, B_11, B_12, mitad);
     	int** M_7 = m6_m7(A_12, A_22, B_21, B_22, mitad);
 
-    	int** C_11 = sum(sub(sum(M_1, M_4, mitad), M_5, mitad), M_7, mitad);
-    	int** C_12 = sum(M_3, M_5, mitad);
-    	int** C_21 = sum(M_2, M_4, mitad);
-    	int** C_22 = sum(sum(sub(M_1, M_2, mitad), M_3, mitad), M_6, mitad);
+    	int** C_11 = add(sub(add(M_1, M_4, mitad), M_5, mitad), M_7, mitad);
+    	int** C_12 = add(M_3, M_5, mitad);
+    	int** C_21 = add(M_2, M_4, mitad);
+    	int** C_22 = add(add(sub(M_1, M_2, mitad), M_3, mitad), M_6, mitad);
 
     	for (int i = 0; i < mitad; i++) {
         	for (int j = 0; j < mitad; j++) {
@@ -175,49 +115,3 @@ int** mult_matrices(int** a, int** b,int dim){
 
 
 }
-
-int main() {
-    int dim = 4;
-
-    // Define matrix A
-    int A_vals[4][4] = {
-        {1, 2, 3, 4},
-        {5, 6, 7, 8},
-        {9, 8, 7, 6},
-        {5, 4, 3, 2}
-    };
-
-    // Define matrix B
-    int B_vals[4][4] = {
-        {1, 0, 1, 0},
-        {0, 1, 0, 1},
-        {1, 0, 1, 0},
-        {0, 1, 0, 1}
-    };
-
-    // Allocate and fill matrix A
-    int** A = creacion_matriz(dim);
-    int** B = creacion_matriz(dim);
-    for (int i = 0; i < dim; ++i) {
-        for (int j = 0; j < dim; ++j) {
-            A[i][j] = A_vals[i][j];
-            B[i][j] = B_vals[i][j];
-        }
-    }
-
-    // Multiply using Strassen
-    int** C = mult_matrices(A, B, dim);
-
-    // Print result
-    cout << "Result of A × B:" << endl;
-    printMatrix(C, dim);
-
-    // Clean up
-    free_matriz(A, dim);
-    free_matriz(B, dim);
-    free_matriz(C, dim);
-
-    return 0;
-}
-
-
