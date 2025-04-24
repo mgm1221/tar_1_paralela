@@ -6,97 +6,9 @@
 
 using namespace std;
 
-int** m1(int** a_1,int** a_2,int** b_1,int** b_2, int dim){
-	int** sub_matriz_1,**sub_matriz_2;
-	#pragma omp parallel
-	{
-		#pragma omp single	
-		{
-			#pragma omp task
-			{sub_matriz_1 = add(a_1,a_2,dim);}
-			#pragma omp task
-			{sub_matriz_2 = add(b_1,b_2,dim);}
-			#pragma omp taskwait
-		}
-	}
-	int** result = multiply(sub_matriz_1,sub_matriz_2,dim);
-	free_mat(sub_matriz_1,dim);
-	free_mat(sub_matriz_2,dim);
-	return result;
-
-}
-int** m2_m5(int** sum_1,int** sum_2, int** mul,int dim){
-	int** sub_matriz = add(sum_1,sum_2,dim);
 	
-	int** result = multiply(sub_matriz,mul,dim);
-	free_mat(sub_matriz,dim);
-	return result;
-}
-int** m3_m4(int** sub_1,int** sub_2, int** mul,int dim){
-	int** sub_matriz = sub(sub_1,sub_2,dim);
 
-        int** result = multiply(mul,sub_matriz,dim);
-	free_mat(sub_matriz,dim);
-        return result;
-}
-int** m6_m7(int** a_1,int** a_2,int** b_1,int** b_2, int dim){
-	int** sub_matriz_1,**sub_matriz_2;
-        #pragma omp parallel
-	{
-		#pragma omp single
-	
-        	{
-                	#pragma omp task
-	                {sub_matriz_1 = sub(a_1,a_2,dim);}
-        	        #pragma omp task
-                	{sub_matriz_2 = add(b_1,b_2,dim);}
-	                #pragma omp taskwait 
-       	 	}
-	}
-        int** result = multiply(sub_matriz_1,sub_matriz_2,dim);
-	
-	free_mat(sub_matriz_1,dim);
-	free_mat(sub_matriz_2,dim);
-        
-	return result;
-
-}
-tuple<int**,int**,int**,int**> separar_matriz(int** mat,int dim){
-	
-	int dim_2 = dim / 2;
-
-    	int** A11 = new_mat(dim_2);
-    	int** A12 = new_mat(dim_2);
-    	int** A21 = new_mat(dim_2);
-    	int** A22 = new_mat(dim_2);
-
-    	for (int i = 0; i < dim_2; ++i) {
-        	for (int j = 0; j < dim_2; ++j) {
-            		A11[i][j] = mat[i][j];
-            		A12[i][j] = mat[i][j + dim_2];
-            		A21[i][j] = mat[i + dim_2][j];
-            		A22[i][j] = mat[i + dim_2][j + dim_2];
-
-        	}
-    	}
-
-    	tuple<int**,int**,int**,int**> result = make_tuple(A11, A12, A21, A22);	
-	
-	return result;
-
-}
-
-
-void printMatrix(int** mat, int dim) {
-    for (int i = 0; i < dim; ++i) {
-        for (int j = 0; j < dim; ++j)
-            cout << mat[i][j] << " ";
-        cout << endl;
-    }
-}
-
-
-int** Strassen_Matrix_Multiplication(int** a, int** b,int dim){
+int** Strassen_Matrix_Multiplication_parallel(int** a, int** b,int dim){
 	
 	int** result = new_mat(dim);
 	int** A_11, **A_12, **A_21, **A_22;

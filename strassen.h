@@ -10,6 +10,6 @@ int** m6_m7(int** a_1,int** a_2,int** b_1,int** b_2, int dim);
 
 std::tuple<int**,int**,int**,int**> separar_matriz(int** mat,int dim);
 int** Strassen_Matrix_Multiplication(int** a, int** b, int dim);
-
+int** Strassen_Matrix_Multiplication_parallel(int** a, int** b, int dim);
 
 #endif

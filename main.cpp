@@ -54,13 +54,21 @@ int main() {
 		    duration_ms = static_cast<double>(chrono::duration_cast<chrono::milliseconds>(end - start).count());
 
 		    time_strassen += duration_ms;
+		
+		start = chrono::high_resolution_clock::now();
+            	int** result_strassen_parallel = Strassen_Matrix_Multiplication(A, B ,i);
+            	end = chrono::high_resolution_clock::now();
 
+                    duration_ms = static_cast<double>(chrono::duration_cast<chrono::milliseconds>(end - start).count());
+
+                    time_strassen_parallel += duration_ms;	
 
             for (int k = 0; k < k; k++) {
 
                 delete[] result_blocks[k];
                 delete[] result_blocks_parallel[k];
                 delete[] result_strassen[k];
+		delete[] result_strassen_parallel[k];
    
    
             }
@@ -68,12 +76,14 @@ int main() {
             delete[] result_blocks;
             delete[] result_blocks_parallel;
             delete[] result_strassen;
+	    delete[] result_strassen_parallel;
         }
 
 		time_blocks =  time_blocks / 10;
         time_blocks_parallel =  time_blocks_parallel / 10;
         time_strassen = time_strassen / 10;
-
+	time_strassen_parallel = time_strassen_parallel/10;
+	
         cout<<"Size: " << i << ", Time blocks: " << time_blocks <<", Time blocks parallel: "<< time_blocks_parallel << ", Time strassen: " << time_strassen << ", Time strassen parallel: " <<time_strassen_parallel << endl; 
 
 
