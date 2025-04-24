@@ -20,16 +20,18 @@ int** initialize_mat(int rows, int cols){
 
 }
 
-int** new_mat(int size){
-
+int** new_mat(int size) {
     int** mat = new int*[size];
-    
-    for (int i = 0; i < size; i++){
+
+    for (int i = 0; i < size; i++) {
         mat[i] = new int[size];
+        std::fill(mat[i], mat[i] + size, 0);
+
     }
 
     return mat;
 }
+
 
 void free_mat(int** mat, int size) {
 
