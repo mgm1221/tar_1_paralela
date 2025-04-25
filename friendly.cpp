@@ -5,13 +5,26 @@
 
 using namespace std;
 
+void flush_cache() {
+    const size_t cache_size = 32 * 1024 * 1024;
+    char* dummy = new char[cache_size];
+
+    for (size_t i = 0; i < cache_size; ++i) {
+        dummy[i] = i;
+    }
+
+    volatile char sink = 0;
+    for (size_t i = 0; i < cache_size; ++i) {
+        sink ^= dummy[i];
+    }
+
+    delete[] dummy;
+}
 
 void free_mat(int** mat, int size) {
-
     for (int i = 0; i < size; i++)
         delete[] mat[i];
     delete[] mat;
-
 }
 
 int* initialize_mat(int rows, int cols) {
@@ -28,6 +41,12 @@ int* initialize_mat(int rows, int cols) {
     return matrix;
 }
 
+void transpose(int* B, int* B_T, int size) {
+    for (int i = 0; i < size; ++i)
+        for (int j = 0; j < size; ++j)
+            B_T[j * size + i] = B[i * size + j];
+}
+
 int* multiply_cache_friendly(int* A, int* B, int size) {
     int* C = new int[size * size]();
 
@@ -39,41 +58,39 @@ int* multiply_cache_friendly(int* A, int* B, int size) {
     return C;
 }
 
-int main(){
+int main() {
+    int i  = 500;
 
-    for(int i = 1600; i <= 1601; i+=50){
-       
-        double time = 0;
+    double time = 0;
 
-        int* A; 
-        int* B;
-    
-        for(int j = 0; j < 1; j++){
+    int* A;
+    int* B;
 
-            A = initialize_mat(i, i); 
-            B = initialize_mat(i, i);
+    for (int j = 0; j < 10; j++) {
 
-            //auto start = chrono::high_resolution_clock::now();
-            int* result = multiply_cache_friendly(A, B, i);
-            //auto end = chrono::high_resolution_clock::now();
+        A = initialize_mat(i, i);
+        B = initialize_mat(i, i);
 
-            //double duration_ms = static_cast<double>(chrono::duration_cast<chrono::milliseconds>(end - start).count());
+        flush_cache();
+        auto start = chrono::high_resolution_clock::now();
+        int* result = multiply_cache_friendly(A, B, i);
+        auto end = chrono::high_resolution_clock::now();
 
-		    //time += duration_ms;
+        double duration_ms = static_cast<double>(chrono::duration_cast<chrono::milliseconds>(end - start).count());
 
-            delete[] result;
+        time += duration_ms;
 
-        }
-
-		time =  time / 100;
-
-        //cout<<"Size: " << i << ", Time cache frienly: " << time << endl; 
-
-        delete[] A;
-        delete[] B;
-
-
+        delete[] result;
     }
 
+    time = time / 10;
+
+    cout << "Size: " << i << ", Time cache friendly: " << time << " ms" << endl;
+
+    delete[] A;
+    delete[] B;
+    
+
     return 0;
+
 }
