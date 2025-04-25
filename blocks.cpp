@@ -95,7 +95,7 @@ int** Block_Matrix_Multiplication(int** A, int** B, int size, int min_Size){
 
         int** C4_part1 = multiply(A3, B2, new_size);
         int** C4_part2 = multiply(A4, B4, new_size);
-        int** C4 = add(C4_part1, C4_part2, new_size); //FIX ORDER TO MULTIPlY SHIT
+        int** C4 = add(C4_part1, C4_part2, new_size);
 
         int** C = merge(C1, C2, C3, C4, new_size);
 
